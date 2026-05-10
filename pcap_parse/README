@@ -1,0 +1,8 @@
+#Demo file
+
+This requires a pcap file captured using TCP dump or wireshark. It can then be run from the command line with something like 
+
+./speed.py 91.189.91.124 ~/ubuntu.pcap 
+./speed.py 5.28.62.245 ~/wget.pcap 
+
+The first argument is an IP address that you want traffic to/from the second argument is pre-existing pcap file.
