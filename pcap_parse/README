@@ -1,6 +1,8 @@
 #Demo file
 
-This requires a pcap file captured using TCP dump or wireshark. It can then be run from the command line with something like 
+This requires a pcap file captured using TCPdump or wireshark. So you would use those programs to create a file of type .pcap. (I am not sure it would work with the wireshark specific pcap variant -- wireshark has a "save as PCAP" argument). 
+
+It can then be run from the command line with something like 
 
 ./speed.py 91.189.91.124 ~/ubuntu.pcap 
 ./speed.py 5.28.62.245 ~/wget.pcap 
