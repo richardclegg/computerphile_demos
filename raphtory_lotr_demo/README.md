@@ -8,6 +8,12 @@ To browse the graph you need to go to that site on your web browser.
 Go to "list of saved graphs" on the left hand side of the interface and select LOTR.
 You can now use your mouse to zoom and pan. 
 
+On ubuntu you probably want to use a virtual environment e.g.
+python3 -m venv my-venv
+my-venv/bin/pip install raphtory
+my-venv/bin/pip install matplotlib
+my-venv/bin/pip install pandas
+my-venv/bin/python3 raphtory_test.py 
 
 
 
