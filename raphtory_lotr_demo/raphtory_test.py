@@ -17,11 +17,12 @@ lotr_graph.load_edges(
 
 pr= rp.algorithms.pagerank(lotr_graph)
 
-#top_5 = pr.top_k(50)
-gandalf_rank = pr.get("Gandalf")
-#print(f"Gandalf's ranking is {round(gandalf_rank, 5)}\n")
-frodo_rank = pr.get("Frodo")
-#print(f"Frodo's ranking is {round(frodo_rank, 5)}\n")
+
+#top_5 = pr.__getitem__("pagerank_score").top_k(5)
+gandalf_rank = pr.get("Gandalf").__getitem__("pagerank_score")
+print(f"Gandalf's ranking is {round(gandalf_rank, 5)}\n")
+frodo_rank = pr.get("Frodo").__getitem__("pagerank_score")
+print(f"Frodo's ranking is {round(frodo_rank, 5)}\n")
 #for rank, (node, score) in enumerate(top_5.items(), 1):
 #    print(f"Rank {rank}: {node.name} with a score of {score:.5f}")
 
