@@ -1,5 +1,5 @@
 #!/bin/sh
-# load.sh - send 10 orders to each server, all at the same time.
+# crasher.sh - send 100 orders to each server, all close together.
 # The & runs each curl in the background, so they all happen together.
 # --max-time 5 makes curl give up after 5 seconds instead of hanging forever.
 

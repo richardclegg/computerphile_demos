@@ -18,56 +18,64 @@ import time
 import urllib.request
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
-#We take port numbers as command line arguments
+# We take port numbers as command line arguments
 if len(sys.argv) != 3:
     print("Usage: ./fail_system.py MY_PORT PEER_PORT")
     print("Example: ./fail_system.py 8001 8002")
-    sys.exit(1) 
+    sys.exit(1)
 MY_PORT = int(sys.argv[1])    # the port this server listens on
 PEER_PORT = int(sys.argv[2])  # the port of the other server
- 
+
 # Only 4 requests may be worked on at once. This is our "worker pool".
 # Real servers have the same kind of limit (threads, processes,
 # database connections). A semaphore is a counter: taking a worker
 # subtracts one, giving it back adds one, and anyone who tries to take
 # a worker when the counter is zero has to wait.
 workers = threading.Semaphore(4)
- 
- 
+
+
 class Handler(BaseHTTPRequestHandler):
- 
+
     def do_GET(self):
         if self.path == "/order":
             # Take a worker. If all 4 are busy, wait here until one is free.
             workers.acquire()
             # Ask the other server to check stock, and wait for its reply.
             # THE BUG: we keep hold of our worker the whole time we wait.
-            # (In real code, wrap this in try/finally so the worker is released even
-            #  if the peer is down. Otherwise each failed call leaks a worker for good.)
-            url = "http://localhost:" + str(PEER_PORT) + "/check"
+            url = f"http://localhost:{PEER_PORT}/check"
             urllib.request.urlopen(url).read()
             # Give the worker back so someone else can use it.
             workers.release()
+            # (In real code, use try/finally so the worker is given back
+            #  even if the other server is down. Otherwise each failed
+            #  call loses a worker for good.)
 
-        if self.path == "/check":
+        elif self.path == "/check":
+            # In the deadlock, requests from the other server wait HERE
+            # forever: all our workers are busy waiting for that server.
             workers.acquire()
             # Pretend to do some database work.
             time.sleep(0.05)
             workers.release()
 
+        else:
+            # Any other page (a typo, a browser asking for /favicon.ico).
+            self.send_response(404)
+            self.end_headers()
+            return
+
         # Send the reply.
         self.send_response(200)
         self.end_headers()
         self.wfile.write(b"ok\n")
- 
+
     def log_message(self, *args):
         # Stop the server printing a line for every request.
         pass
- 
- 
+
+
 # Start the server. It makes a new thread for every request that arrives,
 # but those threads can only do useful work once they get a worker.
 print("Server on port", MY_PORT, "talking to port", PEER_PORT)
 server = ThreadingHTTPServer(("", MY_PORT), Handler)
 server.serve_forever()
- 
