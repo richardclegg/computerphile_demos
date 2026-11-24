@@ -1,18 +1,17 @@
 #!/usr/bin/env python3
-# node_deadlock.py
+# fail_system.py
 #
 # A tiny "shop" made of two identical servers that talk to each other.
 # It works perfectly when used slowly, and locks up forever under load.
 #
 # Run two copies, in two terminals:
-#   python node_deadlock.py 8001 8002
-#   python node_deadlock.py 8002 8001
+#   python fail_system.py 8001 8002
+#   python fail_system.py 8002 8001
 #
 # Each server has two web pages:
 #   /order  - called by customers. To take an order we must ask the OTHER
 #             server to check stock, so this page calls the peer's /check.
 #   /check  - called by the other server. Pretends to look up a database.
-#!/usr/bin/env python3
 import sys
 import threading
 import time
@@ -38,22 +37,24 @@ workers = threading.Semaphore(4)
 class Handler(BaseHTTPRequestHandler):
  
     def do_GET(self):
-        # Take a worker. If all 4 are busy, wait here until one is free.
-        workers.acquire()
- 
         if self.path == "/order":
+            # Take a worker. If all 4 are busy, wait here until one is free.
+            workers.acquire()
             # Ask the other server to check stock, and wait for its reply.
             # THE BUG: we keep hold of our worker the whole time we wait.
+            # (In real code, wrap this in try/finally so the worker is released even
+            #  if the peer is down. Otherwise each failed call leaks a worker for good.)
             url = "http://localhost:" + str(PEER_PORT) + "/check"
             urllib.request.urlopen(url).read()
- 
+            # Give the worker back so someone else can use it.
+            workers.release()
+
         if self.path == "/check":
+            workers.acquire()
             # Pretend to do some database work.
             time.sleep(0.05)
- 
-        # Give the worker back so someone else can use it.
-        workers.release()
- 
+            workers.release()
+
         # Send the reply.
         self.send_response(200)
         self.end_headers()

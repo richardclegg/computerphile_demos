@@ -12,6 +12,8 @@ This will start both systems
 To attack them 
 ./crasher.sh
 
-If the sleep command is high > 0.05 it should run count to 100 and print that 200 OK messages were received
+If the sleep command in crasher.sh is high > 0.05 it should run count to 100 and print that 200 OK messages were received
 
 If the sleep command is low < 0.02 it will lock the systems (you will need to kill them with kill -9) produce some messages and count that < 200 messages were received
+
+In between maybe it will run.
