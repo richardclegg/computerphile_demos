@@ -17,3 +17,5 @@ If the sleep command in crasher.sh is high > 0.05 it should run count to 100 and
 If the sleep command is low < 0.02 it will lock the systems (you will need to kill them with kill -9) produce some messages and count that < 200 messages were received
 
 In between maybe it will run.
+
+It's important to note that this is a demo only. An exercise in constructing a minimal example of a system that locks up because it is distributed over the network. The workers don't do any useful work in this example, they are a placeholder for how those things would be in a real system. 
